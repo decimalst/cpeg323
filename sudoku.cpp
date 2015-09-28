@@ -153,12 +153,10 @@ solve(char *board_init[GRID_SQUARED]) {
   init_board(board_init);
   bool changed;
   do {
+    changed = rule1();
+    changed |= rule2();
     print_board_verbose();
     print_board(board);
-	 changed = rule1();
-	 changed |= rule2();
-   print_board_verbose();
-   print_board(board);
   } while (changed);
   if (board_done(board)) {
 	 printf("SUCCESS!\n");
@@ -204,6 +202,8 @@ int bit_count(int value) {
     }
   }
   return count;
+  // This is also implemented as a gcc __builtin_ function
+  // return __builtin_popcount(value);
 }
 
 int get_nth_set_bit(int value, int index) {
@@ -224,18 +224,7 @@ int get_nth_set_bit(int value, int index) {
 
 bool singleton(int value) {
   //This function checks if only a single bit is set in value
-  if(value){
-    int alt = value -1;
-    if(!(value & alt)){
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
-  else{
-    return false;
-  }
+  return value && !(value & (value - 1));
 }
 
 int get_singleton(int value) {
@@ -255,44 +244,43 @@ bool rule2() {
   int ksum=ALL_VALUES;
   for (int i = 0; i < GRID_SQUARED; ++ i){
     for (int j = 0; j < GRID_SQUARED; ++ j){
-      int value = board[i][j];
-      if (!singleton(value)){
+      if (!singleton(board[i][j])){
         //First, we check all values along the row
         for(int k = 0; k < GRID_SQUARED; ++k){
           //add to isum all values from board[k][j] where k!=i
           if(k!=i){
-            isum = isum ^ board[k][j];
+            isum = isum & board[k][j];
             }
         }
         //set board[i][j] to possibility not in i sum
-        if(bit_count(isum)!=9){
-           board[i][j] = board[i][j] & isum;
+        if(singleton(isum)){
+           board[i][j] = board[i][j] ^ ~isum;
            changed=true;
         }
         for(int k = 0; k < GRID_SQUARED; ++k ){
         //Now we check all values along the column
           if(k!=j){
-              jsum = jsum ^ board[i][k];
+              jsum = jsum & board[i][k];
           }
         }
         //set board[i][j] to possibility not in j sum
-        if(bit_count(jsum)!=9){
-          board[i][j] = board[i][j] & jsum;
+        if(singleton(jsum)){
+          board[i][j] = board[i][j] ^ ~jsum;
           changed=true;
         }
         //Now we check all quadrant values
         //We can find the quadrant the position is by dividing by 3
         int xquad = i / 3;
         int yquad = j / 3;
-        for (int k = (xquad*3); k < (1+xquad)*3; ++k){
-            for(int l = (yquad*3); l < (1+yquad)*3; ++l){
-              if (k != i && l!=j){
-                ksum = ksum ^ board[k][l];
+        for (int k = (xquad*3); k < (1+xquad)*3; k++){
+            for(int l = (yquad*3); l < (1+yquad)*3; l++){
+              if (k != i && l != j){
+                ksum = ksum & board[k][l];
               }
             }
           }
-        if(bit_count(ksum)!=9){
-          board[i][j] = board[i][j] & ksum;
+        if(singleton(ksum)){
+          board[i][j] = board[i][j] ^ ~ksum;
           changed=true;
         }
       }
