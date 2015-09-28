@@ -153,10 +153,9 @@ solve(char *board_init[GRID_SQUARED]) {
   init_board(board_init);
   bool changed;
   do {
+    print_board(board);
     changed = rule1();
     changed |= rule2();
-    print_board_verbose();
-    print_board(board);
   } while (changed);
   if (board_done(board)) {
 	 printf("SUCCESS!\n");
@@ -176,7 +175,8 @@ main() {
   printf("bit_count(0x34) = %d\n", bit_count(0x34));
   printf("get_nth_set_bit(0x34, 1) = %d\n", get_nth_set_bit(0x34, 1));
   printf("singleton(0x40) = %s\n", singleton(0x40) ? "TRUE" : "FALSE");
-  printf("get_singleton(0x40) = %d\n\n", get_singleton(0x40));
+  printf("get_singleton(0x40) = %d\n", get_singleton(0x40));
+  printf("get_singleton(0x1) = %d\n", get_singleton(0x1));
   printf("singleton(0x3) = %s\n", singleton(0x3) ? "TRUE" : "FALSE");
   printf("EASY BOARD:\n");
   bool solved = solve(easy_board_init);
@@ -229,7 +229,7 @@ bool singleton(int value) {
 
 int get_singleton(int value) {
   int returnVal;
-  for(int i=1;i<31;i++){
+  for(int i=0;i<31;i++){
     if(value & ( 1 << i)){
       returnVal=i;
     }
@@ -286,5 +286,5 @@ bool rule2() {
       }
     }
   }
-return changed; 
+  return changed; 
 }
