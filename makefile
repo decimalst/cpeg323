@@ -1,2 +1,2 @@
 all:
-	g++ sudoku.cpp -o sudoku -g
+	g++ sudoku.c -o sudoku -g
