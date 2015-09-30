@@ -240,9 +240,11 @@ int get_singleton(int value) {
 
 bool rule2() {
   bool changed=false;   
-  int isum=ALL_VALUES;
-  int jsum=ALL_VALUES;
-  int ksum=ALL_VALUES;
+  int isum=0;
+  int jsum=0;
+  int ksum=0;
+  int xquad=0;
+  int yquad=0;
   for (int i = 0; i < GRID_SQUARED; ++ i){
     for (int j = 0; j < GRID_SQUARED; ++ j){
       int value = board[i][j];
@@ -255,9 +257,10 @@ bool rule2() {
             }
         }
         //set board[i][j] to possibility not in i sum
-        if(!singleton(isum)){
-           board[i][j] = board[i][j] & isum;
+        if(isum!=ALL_VALUES){
+           board[i][j] = board[i][j] & ~isum;
            changed=true;
+           isum = 0;
         }
         for(int k = 0; k < GRID_SQUARED; ++k ){
         //Now we check all values along the column
@@ -266,24 +269,33 @@ bool rule2() {
           }
         }
         //set board[i][j] to possibility not in j sum
-        if(!singleton(jsum)){
-          board[i][j] = board[i][j] & jsum;
+        if(jsum != ALL_VALUES){
+          board[i][j] = board[i][j] & ~jsum;
           changed=true;
+          jsum = 0;
         }
         //Now we check all quadrant values
         //We can find the quadrant the position is by dividing by 3
-        int xquad = i / 3;
-        int yquad = j / 3;
+        xquad = i / 3;
+        yquad = j / 3;
         for (int k = (xquad*3); k < (1+xquad)*3; k++){
             for(int l = (yquad*3); l < (1+yquad)*3; l++){
-              if (k != i && l != j){
-                ksum = ksum | board[k][l];
+              if (k != i){
+               if (l != j){
+                  ksum = ksum | board[k][l];
+              }
+              }
+              if (l != j){
+                if(k != i){
+                  ksum = ksum | board[k][l];
+                 }
               }
             }
-          }
-        if(!singleton(ksum)){
-          board[i][j] = board[i][j] & ksum;
+        }
+        if(ksum != ALL_VALUES){
+          board[i][j] = board[i][j] & ~ksum;
           changed=true;
+          ksum = 0;
         }
       }
     }
