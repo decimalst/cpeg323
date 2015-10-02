@@ -229,7 +229,7 @@ bool singleton(int value) {
 }
 
 int get_singleton(int value) {
-  int returnVal;
+  int returnVal=0;
   for(int i=0;i<31;i++){
     if(value & ( 1 << i)){
       returnVal=i;
@@ -243,59 +243,52 @@ bool rule2() {
   int isum=0;
   int jsum=0;
   int ksum=0;
-  int xquad=0;
-  int yquad=0;
   for (int i = 0; i < GRID_SQUARED; ++ i){
     for (int j = 0; j < GRID_SQUARED; ++ j){
       int value = board[i][j];
+      isum = 0;
+      jsum = 0;
+      ksum = 0;
       if (!singleton(value)){
-        //First, we check all values along the row
-        for(int k = 0; k < GRID_SQUARED; ++k){
+        //First, we check all values along the rows
+        for(int row = 0; row < GRID_SQUARED; row++){
           //add to isum all values from board[k][j] where k!=i
-          if(k!=i){
-            isum = isum | board[k][j];
+          if(row!=i){
+            isum = isum | board[row][j];
             }
         }
         //set board[i][j] to possibility not in i sum
         if(isum!=ALL_VALUES){
-           board[i][j] = board[i][j] & ~isum;
+           board[i][j] = board[i][j] ^ isum;
            changed=true;
-           isum = 0;
         }
-        for(int k = 0; k < GRID_SQUARED; ++k ){
-        //Now we check all values along the column
-          if(k!=j){
-              jsum = jsum | board[i][k];
+        for(int col = 0; col < GRID_SQUARED; col++ ){
+        //Now we check all values board[i][k] along the columns
+          if(col!=j){
+              jsum = jsum | board[i][col];
           }
         }
         //set board[i][j] to possibility not in j sum
         if(jsum != ALL_VALUES){
-          board[i][j] = board[i][j] & ~jsum;
+          board[i][j] = board[i][j] ^ jsum;
           changed=true;
-          jsum = 0;
         }
         //Now we check all quadrant values
         //We can find the quadrant the position is by dividing by 3
-        xquad = i / 3;
-        yquad = j / 3;
-        for (int k = (xquad*3); k < (1+xquad)*3; k++){
-            for(int l = (yquad*3); l < (1+yquad)*3; l++){
-              if (k != i){
-               if (l != j){
-                  ksum = ksum | board[k][l];
-              }
-              }
-              if (l != j){
-                if(k != i){
-                  ksum = ksum | board[k][l];
-                 }
+        int yquad = get_square_begin(i);
+        int xquad = get_square_begin(i);
+        //printf("xquad = %d yquad = %d\n",xquad,yquad);
+        for (int row1 = yquad; row1 < (yquad + GRIDSIZE); row1++){
+            for(int col1 = xquad; col1 < (xquad + GRIDSIZE); col1++){
+              if (!((row1 == i) && (col1 == j))){
+                //printf("row1 = %d i = %d col1 = %d j = %d\n",row1,i,col1,j);
+                  ksum = ksum | board[row1][col1];
               }
             }
         }
         if(ksum != ALL_VALUES){
-          board[i][j] = board[i][j] & ~ksum;
+          board[i][j] = board[i][j] ^ ksum;
           changed=true;
-          ksum = 0;
         }
       }
     }
