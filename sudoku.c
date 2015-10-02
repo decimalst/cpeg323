@@ -259,7 +259,7 @@ bool rule2() {
         }
         //set board[i][j] to possibility not in i sum
         if(isum!=ALL_VALUES){
-           board[i][j] = board[i][j] ^ isum;
+           board[i][j] = board[i][j] & ~isum;
            changed=true;
         }
         for(int col = 0; col < GRID_SQUARED; col++ ){
@@ -270,13 +270,13 @@ bool rule2() {
         }
         //set board[i][j] to possibility not in j sum
         if(jsum != ALL_VALUES){
-          board[i][j] = board[i][j] ^ jsum;
+          board[i][j] = board[i][j] & ~jsum;
           changed=true;
         }
         //Now we check all quadrant values
         //We can find the quadrant the position is by dividing by 3
         int yquad = get_square_begin(i);
-        int xquad = get_square_begin(i);
+        int xquad = get_square_begin(j);
         //printf("xquad = %d yquad = %d\n",xquad,yquad);
         for (int row1 = yquad; row1 < (yquad + GRIDSIZE); row1++){
             for(int col1 = xquad; col1 < (xquad + GRIDSIZE); col1++){
@@ -287,7 +287,7 @@ bool rule2() {
             }
         }
         if(ksum != ALL_VALUES){
-          board[i][j] = board[i][j] ^ ksum;
+          board[i][j] = board[i][j] & ~ksum;
           changed=true;
         }
       }
