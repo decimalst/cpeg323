@@ -83,7 +83,7 @@ main:
 print_int_and_space:
 	li   	$v0, 1         	# load the syscall option for printing ints
 	syscall              	# print the element
-print_space:
+#print_space:
 	li   	$a0, 32        	# print a black space (ASCII 32)
 	li   	$v0, 11        	# load the syscall option for printing chars
 	syscall              	# print the char
